@@ -8,8 +8,15 @@
 
 #import "LocationProvider.h"
 
+@interface LocationProvider()
+
+@property (strong) CLLocation* lastLocation;
+
+@end
+
 @implementation LocationProvider {
     CLLocationManager *locationManager;
+    BOOL errorDelegateCalled;
 }
 
 + (id)sharedInstance {
@@ -24,6 +31,7 @@
 - (id)init {
     if ((self = [super init])) {
         locationManager = [[CLLocationManager alloc] init];
+        errorDelegateCalled = NO;
     }
     
     return self;
@@ -38,6 +46,9 @@
 }
 
 - (void)stopUpdatingLocation {
+    errorDelegateCalled = NO;
+    self.lastLocation = nil;
+    
     [locationManager stopUpdatingLocation];
 }
 
@@ -45,13 +56,21 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCurrentLocationUpdated object:nil userInfo:@{@"error" : error}];
+    if (!errorDelegateCalled) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kCurrentLocationUpdated object:nil userInfo:@{@"error" : error}];
+        
+        errorDelegateCalled = YES;
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
     CLLocation *currentLocation = [locations lastObject];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCurrentLocationUpdated object:currentLocation];
+    if (self.lastLocation == nil && self.lastLocation.timestamp != currentLocation.timestamp) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kCurrentLocationUpdated object:currentLocation];
+        
+        self.lastLocation = currentLocation;
+    }
 }
 
 @end

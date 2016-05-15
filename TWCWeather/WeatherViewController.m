@@ -129,12 +129,12 @@
 }
 
 - (void)locationUpdated:(NSNotification*)notif {
+    [[LocationProvider sharedInstance] stopUpdatingLocation];
+    
     if ([notif.object isKindOfClass:[CLLocation class]]) {
         CLLocation* loc = (CLLocation*)notif.object;
         
         [self downloadWeatherData:loc.coordinate];
-        
-        [[LocationProvider sharedInstance] stopUpdatingLocation];
     } else {
         [self stopWeatherIconSpinning];
         self.settingsButton.enabled = YES;
