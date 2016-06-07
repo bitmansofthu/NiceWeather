@@ -10,8 +10,8 @@
 
 @interface WeatherInfo : NSObject
 
-@property (nonatomic, assign) NSNumber* temp;
-@property (nonatomic, assign) NSNumber* cloudiness;
+@property (nonatomic, strong) NSNumber* temp;
+@property (nonatomic, strong) NSNumber* cloudiness;
 @property (nonatomic, strong) NSString* condition;
 
 @end
