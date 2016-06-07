@@ -9,13 +9,12 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
-static NSString* const kCurrentLocationUpdated = @"kCurrentLocationUpdated";
+typedef void(^LocationUpdateCompleted)(CLLocation*);
+typedef void(^LocationUpdateFailed)(NSError*);
 
 @interface LocationProvider : NSObject<CLLocationManagerDelegate>
 
-+ (id)sharedInstance;
-
-- (void)startUpdatingLocation;
+- (void)updateLocationWithCompletion:(LocationUpdateCompleted)complete failure:(LocationUpdateFailed)failed ;
 - (void)stopUpdatingLocation;
 
 @end

@@ -39,13 +39,15 @@
 
 @implementation WeatherViewController{
     BOOL weatherIconAnimating;
+    LocationProvider* locationProvider;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    locationProvider = [[LocationProvider alloc] init];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(niceTempChanged:) name:kNiceTempValueChanged object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationUpdated:) name:kCurrentLocationUpdated object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
@@ -82,7 +84,15 @@
     
     self.settingsButton.enabled = NO;
     
-    [[LocationProvider sharedInstance] startUpdatingLocation];
+    [locationProvider updateLocationWithCompletion:^(CLLocation *location) {
+        [self downloadWeatherData:location.coordinate];
+    } failure:^(NSError *error) {
+        [self stopWeatherIconSpinning];
+        self.settingsButton.enabled = YES;
+        
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Info", nil) message:NSLocalizedString(@"Current location is unavailable.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles: nil];
+        [alert show];
+    }];
 }
 
 - (void)downloadWeatherData:(CLLocationCoordinate2D)coordinates {
@@ -128,22 +138,6 @@
     [[NSUserDefaults standardUserDefaults] setInteger:self.niceTemp forKey:NICE_TEMP_KEY];
     
     [self updateStatusLabel];
-}
-
-- (void)locationUpdated:(NSNotification*)notif {
-    [[LocationProvider sharedInstance] stopUpdatingLocation];
-    
-    if ([notif.object isKindOfClass:[CLLocation class]]) {
-        CLLocation* loc = (CLLocation*)notif.object;
-        
-        [self downloadWeatherData:loc.coordinate];
-    } else {
-        [self stopWeatherIconSpinning];
-        self.settingsButton.enabled = YES;
-        
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Info", nil) message:NSLocalizedString(@"Current location is unavailable.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles: nil];
-        [alert show];
-    }
 }
 
 - (void)updateStatusLabel {
