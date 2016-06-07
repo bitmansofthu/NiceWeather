@@ -90,28 +90,30 @@
     
     NSArray* coordsArr = @[[NSNumber numberWithDouble:coordinates.latitude], [NSNumber numberWithDouble:coordinates.longitude]];
     
+    __weak WeatherViewController* sself = self;
+    
     // TODO obtain current location
     [provider weatherInfoWithLocation:coordsArr complete:^(WeatherInfo *info, NSError *error) {
-        [self stopWeatherIconSpinning];
+        [sself stopWeatherIconSpinning];
         
-        self.settingsButton.enabled = YES;
+        sself.settingsButton.enabled = YES;
         
         if (error == nil) {
             if (info.temp) {
                 [UIView animateWithDuration:2.0 animations:^{
-                    self.statusLabel.alpha = 1.0;
+                    sself.statusLabel.alpha = 1.0;
                 }];
                 
-                self.currentTemp = [info.temp floatValue];
+                sself.currentTemp = [info.temp floatValue];
                 
-                [self updateStatusLabel];
+                [sself updateStatusLabel];
             }
             
             if (info.cloudiness) {
                 if (info.cloudiness.integerValue < CLOUDINESS_PERCENT_THRESHOLD) {
-                    [self animateGradient:@[(id)self.clearTopColor.CGColor, (id)self.clearBottomColor.CGColor]];
+                    [sself animateGradient:@[(id)sself.clearTopColor.CGColor, (id)sself.clearBottomColor.CGColor]];
                 } else {
-                    [self animateGradient:@[(id)self.cloudyTopColor.CGColor, (id)self.cloudyBottomColor.CGColor]];
+                    [sself animateGradient:@[(id)sself.cloudyTopColor.CGColor, (id)sself.cloudyBottomColor.CGColor]];
                 }
             }
         } else {
