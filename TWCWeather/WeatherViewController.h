@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SettingsTableViewController.h"
 
-@interface WeatherViewController : UIViewController
+@interface WeatherViewController : UIViewController<SettingsTableViewControllerDelegate>
 
 
 @end

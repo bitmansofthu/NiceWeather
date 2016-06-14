@@ -44,7 +44,9 @@
 #pragma mark - Logic
 
 - (IBAction)thresholdSliderChanged:(UISlider *)sender {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kNiceTempValueChanged object:[NSNumber numberWithInteger:sender.value]];
+    if (self.delegate) {
+        [self.delegate niceTempValueChanged:sender.value];
+    }
     
     [self updateTemperatureLabel];
 }

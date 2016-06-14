@@ -47,8 +47,6 @@
     
     locationProvider = [[LocationProvider alloc] init];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(niceTempChanged:) name:kNiceTempValueChanged object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     if ([[NSUserDefaults standardUserDefaults] objectForKey:NICE_TEMP_KEY]) {
@@ -133,8 +131,8 @@
     }];
 }
 
-- (void)niceTempChanged:(NSNotification*)notif {
-    self.niceTemp = [notif.object integerValue];
+- (void) niceTempValueChanged:(NSInteger)value {
+    self.niceTemp = value;
     [[NSUserDefaults standardUserDefaults] setInteger:self.niceTemp forKey:NICE_TEMP_KEY];
     
     [self updateStatusLabel];
@@ -149,9 +147,10 @@
 }
 
 - (IBAction)settingsPressed:(UIButton*)sender {
-    SettingsTableViewController* ctrl = (SettingsTableViewController*)[self.storyboard instantiateViewControllerWithIdentifier:@"settingsNavigationController"];
+    UINavigationController* ctrl = (UINavigationController*)[self.storyboard instantiateViewControllerWithIdentifier:@"settingsNavigationController"];
     
     ctrl.modalPresentationStyle = UIModalPresentationPopover;
+    [(SettingsTableViewController*)ctrl.topViewController setDelegate:self];
     [self presentViewController:ctrl animated:YES completion:nil];
     
     UIPopoverPresentationController *popController = [ctrl popoverPresentationController];

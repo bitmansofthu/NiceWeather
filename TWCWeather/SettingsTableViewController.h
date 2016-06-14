@@ -8,8 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
-static NSString* const kNiceTempValueChanged = @"NiceTempValueChanged";
+@protocol SettingsTableViewControllerDelegate <NSObject>
+
+- (void) niceTempValueChanged:(NSInteger)value;
+
+@end
 
 @interface SettingsTableViewController : UITableViewController
+
+@property (nonatomic, assign) id<SettingsTableViewControllerDelegate> delegate;
 
 @end
