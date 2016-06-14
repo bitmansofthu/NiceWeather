@@ -77,16 +77,18 @@
 }
 
 - (void)updateWeatherAndLocation {
+    __weak WeatherViewController* sself = self;
+    
     [self startWeatherIconSpinning];
     self.statusLabel.alpha = 0;
     
     self.settingsButton.enabled = NO;
     
     [locationProvider updateLocationWithCompletion:^(CLLocation *location) {
-        [self downloadWeatherData:location.coordinate];
+        [sself downloadWeatherData:location.coordinate];
     } failure:^(NSError *error) {
-        [self stopWeatherIconSpinning];
-        self.settingsButton.enabled = YES;
+        [sself stopWeatherIconSpinning];
+        sself.settingsButton.enabled = YES;
         
         UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Info", nil) message:NSLocalizedString(@"Current location is unavailable.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles: nil];
         [alert show];
